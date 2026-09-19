@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#141e30,#243b55);padding:20px}
+.calculator{width:100%;max-width:360px;background:#111827;padding:20px;border-radius:25px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.title{color:white;text-align:center;margin-bottom:15px;font-size:22px;font-weight:bold}
+.display{width:100%;height:90px;background:#020617;border-radius:15px;margin-bottom:15px;padding:15px;color:white;display:flex;align-items:flex-end;justify-content:flex-end;overflow:hidden;font-size:38px;font-weight:bold;word-break:break-all}
+.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+button{height:65px;border:0;border-radius:16px;font-size:21px;font-weight:bold;cursor:pointer;background:#1f2937;color:white;transition:transform .1s,opacity .1s}
+button:active{transform:scale(.94);opacity:.8}
+.operator{background:#f59e0b}.clear{background:#ef4444}.equal{background:#22c55e}.delete{background:#475569}.zero{grid-column:span 2}
+@media(max-width:380px){.calculator{padding:15px}button{height:60px}.display{height:80px;font-size:32px}}
+</style>
+</head>
+<body>
+<div class="calculator">
+<div class="title">🧮 Calculator</div>
+<div id="display" class="display">0</div>
+<div class="buttons">
+<button class="clear" onclick="clearDisplay()">AC</button>
+<button class="delete" onclick="deleteLast()">⌫</button>
+<button onclick="percentage()">%</button>
+<button class="operator" onclick="addOperator('/')">÷</button>
+<button onclick="addNumber('7')">7</button><button onclick="addNumber('8')">8</button><button onclick="addNumber('9')">9</button><button class="operator" onclick="addOperator('*')">×</button>
+<button onclick="addNumber('4')">4</button><button onclick="addNumber('5')">5</button><button onclick="addNumber('6')">6</button><button class="operator" onclick="addOperator('-')">−</button>
+<button onclick="addNumber('1')">1</button><button onclick="addNumber('2')">2</button><button onclick="addNumber('3')">3</button><button class="operator" onclick="addOperator('+')">+</button>
+<button class="zero" onclick="addNumber('0')">0</button><button onclick="addDecimal()">.</button><button class="equal" onclick="calculate()">=</button>
+</div></div>
+<script>
+const display=document.getElementById("display");let expression="";
+function updateDisplay(){display.textContent=expression===""?"0":expression.replace(/\*/g,"×").replace(/\//g,"÷").replace(/-/g,"−")}
+function addNumber(n){expression+=n;updateDisplay()}
+function addOperator(o){if(expression==="")return;let l=expression.slice(-1);if("+-*/".includes(l))expression=expression.slice(0,-1);expression+=o;updateDisplay()}
+function addDecimal(){let p=expression.split(/[\+\-\*\/]/),n=p[p.length-1];if(!n.includes(".")){expression+=".";updateDisplay()}}
+function clearDisplay(){expression="";updateDisplay()}
+function deleteLast(){expression=expression.slice(0,-1);updateDisplay()}
+function percentage(){if(!expression)return;try{let v=eval(expression);expression=String(v/100);updateDisplay()}catch{display.textContent="Error";expression=""}}
+function calculate(){if(!expression)return;try{if("+-*/".includes(expression.slice(-1)))expression=expression.slice(0,-1);let r=Function('"use strict";return ('+expression+')')();if(!Number.isFinite(r))throw Error();expression=String(Math.round((r+Number.EPSILON)*100000000)/100000000);updateDisplay()}catch{display.textContent="Error";expression=""}}
+document.addEventListener("keydown",e=>{if(e.key>="0"&&e.key<="9")addNumber(e.key);else if(e.key===".")addDecimal();else if(["+","-","*","/"].includes(e.key))addOperator(e.key);else if(e.key==="Enter"||e.key==="=")calculate();else if(e.key==="Backspace")deleteLast();else if(e.key==="Escape")clearDisplay();else if(e.key==="%")percentage()});
+</script>
+</body>
+</html>
